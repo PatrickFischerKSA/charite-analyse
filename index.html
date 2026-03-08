@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charité Analyse | Filmanalyse und Serienkonzeption</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="video-layer" aria-hidden="true">
+    <video class="video-bg" autoplay muted loop playsinline preload="auto">
+      <source src="./assets/charite_trailer.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <main class="app-shell">
+    <header class="hero card">
+      <p class="eyebrow">Charité Staffel 1 · Analyseübung</p>
+      <h1>Filmanalyse für Folge 1 und 2 mit direkter Brücke zur eigenen Serie</h1>
+      <p class="hero-copy">
+        Diese Einheit verbindet die ersten beiden Folgen von <em>Charité</em> mit einer Interpretationsmatrix, die Beobachtung,
+        filmsprachliche Mittel, Deutung und Anschluss an eine eigene Serienkonzeption sofort zusammenführt.
+      </p>
+      <div class="hero-actions">
+        <button type="button" id="export-markdown">Auswertung als Markdown exportieren</button>
+        <button type="button" class="ghost" id="reset-state">Eingaben zurücksetzen</button>
+      </div>
+      <div class="source-strip" id="source-strip"></div>
+    </header>
+
+    <section class="grid hero-grid">
+      <article class="card summary-card">
+        <h2>Unterrichtsziel</h2>
+        <p>
+          Die Lernenden analysieren, wie <em>Charité</em> Konflikte, Figuren, audiovisuelle Gestaltung und serielle Anlage in den
+          ersten beiden Folgen organisiert und übertragen diese Erkenntnisse in ein eigenes Serienkonzept.
+        </p>
+      </article>
+      <article class="card summary-card">
+        <h2>Sofortfeedback</h2>
+        <div id="global-feedback" class="global-feedback"></div>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Methodischer Rahmen</p>
+          <h2>Filmanalyse-Struktur</h2>
+        </div>
+        <p class="section-copy">
+          Die Einheit orientiert sich an Erstrezeption, visuellen Mitteln, akustischer Gestaltung und Montage und führt von der
+          Beobachtung direkt zur Deutung.
+        </p>
+      </div>
+      <div class="method-grid" id="method-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Materialbasis</p>
+          <h2>Folgen im Fokus</h2>
+        </div>
+        <p class="section-copy">
+          Die Episodenkarten verbinden die bereitgestellten Transkripte mit den Folgenhinweisen von Das Erste und bündeln die
+          Analyseziele für die Matrix.
+        </p>
+      </div>
+      <div class="episode-grid" id="episode-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Interpretationsmatrix</p>
+          <h2>Episode für Episode auswerten</h2>
+        </div>
+        <p class="section-copy">
+          Jede Zeile verlangt eine konkrete Beobachtung, das benannte filmische Mittel, eine Deutung und einen Transfer in eine
+          eigene Serie. Das Feedback reagiert direkt auf Präzision und Anschlussfähigkeit.
+        </p>
+      </div>
+      <div class="episode-switch" id="episode-switch" role="tablist" aria-label="Folgenauswahl"></div>
+      <div id="matrix-panel"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Transfer</p>
+          <h2>Von der Analyse zur eigenen Serie</h2>
+        </div>
+        <p class="section-copy">
+          Hier verdichten die Lernenden ihre Befunde zu einer tragfähigen Serienprämisse, einem Konfliktsystem und einer eigenen
+          audiovisuellen Handschrift.
+        </p>
+      </div>
+      <div class="concept-grid" id="concept-grid"></div>
+      <div class="concept-feedback-wrap">
+        <div id="concept-feedback" class="concept-feedback"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <small>Charité Analyseübung · Stand 08.03.2026 · Lokale Speicherung im Browser</small>
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
