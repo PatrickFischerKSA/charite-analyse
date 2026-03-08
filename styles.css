@@ -121,9 +121,10 @@ h2 {
 .summary-card p,
 .episode-card p,
 .method-card p,
+.task-card p,
 .row-card p,
 .feedback-block p,
-.concept-field p {
+.takeaway-card p {
   margin: 0;
   color: var(--muted);
   line-height: 1.52;
@@ -224,7 +225,7 @@ button.ghost {
 
 .method-grid,
 .episode-grid,
-.concept-grid {
+.takeaway-grid {
   display: grid;
   gap: 0.8rem;
 }
@@ -234,13 +235,14 @@ button.ghost {
 }
 
 .episode-grid,
-.concept-grid {
+.takeaway-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .method-card,
 .episode-card,
-.concept-field,
+.task-card,
+.takeaway-card,
 .row-card {
   border: 1px solid rgba(218, 228, 220, 0.15);
   border-radius: 18px;
@@ -249,12 +251,66 @@ button.ghost {
 }
 
 .method-card ul,
-.episode-card ul {
+.episode-card ul,
+.task-card ul,
+.support-box ul {
   margin: 0.7rem 0 0;
   padding-left: 1.1rem;
   color: var(--muted);
   display: grid;
   gap: 0.35rem;
+}
+
+.episode-card-dense {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.task-stack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.task-card h4 {
+  margin: 0 0 0.45rem;
+  font-family: "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.18rem;
+}
+
+.task-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+}
+
+.support-box {
+  border: 1px solid rgba(218, 228, 220, 0.12);
+  border-radius: 16px;
+  padding: 0.9rem 0.95rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.support-box strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.support-box p {
+  color: var(--muted);
+}
+
+.support-example {
+  margin-top: 0.65rem !important;
+  color: var(--accent-2) !important;
+  font-size: 0.92rem;
+}
+
+.support-box-suggestion {
+  margin-top: 0.65rem;
+  border-color: rgba(142, 198, 177, 0.28);
+  background: rgba(142, 198, 177, 0.06);
 }
 
 .episode-card header {
@@ -352,6 +408,18 @@ button.ghost {
   gap: 0.8rem;
 }
 
+.task-tools {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
+}
+
+.helper-button {
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+}
+
 label {
   display: grid;
   gap: 0.35rem;
@@ -384,15 +452,6 @@ textarea:focus {
   color: var(--ink);
 }
 
-.concept-field textarea {
-  min-height: 116px;
-}
-
-.concept-feedback-wrap {
-  margin-top: 1rem;
-}
-
-.concept-feedback,
 .row-feedback {
   display: grid;
   gap: 0.5rem;
@@ -420,6 +479,21 @@ textarea:focus {
   background: rgba(255, 143, 125, 0.08);
 }
 
+.suggestion-box {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.takeaway-grid {
+  gap: 0.9rem;
+}
+
+.takeaway-card {
+  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+
 .footer {
   text-align: center;
   color: var(--muted);
@@ -432,7 +506,7 @@ textarea:focus {
   }
 
   .episode-grid,
-  .concept-grid,
+  .takeaway-grid,
   .field-grid,
   .grid.hero-grid,
   .section-head {
@@ -457,7 +531,8 @@ textarea:focus {
 
   .hero-actions,
   .episode-links,
-  .episode-switch {
+  .episode-switch,
+  .task-tools {
     flex-direction: column;
   }
 

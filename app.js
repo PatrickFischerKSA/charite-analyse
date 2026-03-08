@@ -1,6 +1,33 @@
-const STORAGE_KEY = "charite_analyse_v1";
+const STORAGE_KEY = "charite_analyse_v2";
+
+const CONNECTORS = ["weil", "dadurch", "indem", "wodurch", "deshalb", "damit", "so dass", "auf diese weise", "hierdurch"];
+const FILM_TERMS = [
+  "nahaufnahme", "grossaufnahme", "großaufnahme", "detail", "totale", "halbtotale", "amerikanisch", "aufsicht", "untersicht",
+  "normalperspektive", "kamera", "kamerafahrt", "schwenk", "zoom", "licht", "farbe", "kadrierung", "tiefenschaerfe",
+  "tiefenschärfe", "schnitt", "montage", "parallelmontage", "geraeusch", "geräusch", "musik", "stille", "ton", "dialog"
+];
+const THEME_TERMS = [
+  "macht", "hierarchie", "wissenschaft", "barmherzigkeit", "karriere", "armut", "status", "ordnung", "autoritaet", "autorität",
+  "geschlecht", "pflege", "forschung", "medizin", "staat", "politik", "kaiserreich", "klasse", "konflikt", "institution"
+];
+const SERIAL_TERMS = [
+  "folge", "staffel", "serie", "wiederkehr", "offen", "spaeter", "später", "weiter", "entwicklung", "konfliktachse",
+  "dauerkonflikt", "cliffhanger", "mehrere folgen", "episoden", "serielle"
+];
+const EPISODE_ANCHORS = {
+  ep1: ["ida", "lenze", "bering", "ehrlich", "koch", "virchow", "kronprinz", "hoersaal", "hörsaal", "operation", "appendektomie", "charite"],
+  ep2: ["ida", "therese", "bering", "koch", "tischendorf", "kitasato", "tuberkulose", "diphtherie", "labor", "kaiser", "charite"]
+};
 
 const SOURCES = [
+  {
+    label: "Folge 1 in Dropbox",
+    url: "https://www.dropbox.com/scl/fi/e42zk5vr0iicc291ebj8v/Folge-1-Barmherzigkeit-S01E01.mp4?rlkey=etck8r642javgz2habtl2lc5e&st=r4nt04m0&dl=0"
+  },
+  {
+    label: "Folge 2 in Dropbox",
+    url: "https://www.dropbox.com/scl/fi/anohh9fcbs75yp1bxxfrt/Folge-2-Kaiserwetter-S01E02.mp4?rlkey=rj0pbmebj7blwlvtjfgrf254f&st=nvos969x&dl=0"
+  },
   {
     label: "Das Erste: Folgenübersicht",
     url: "https://www.daserste.de/unterhaltung/serie/charite/sendung-staffel-1/charite-staffel-1-filter-alle-folgen100.html"
@@ -20,33 +47,93 @@ const SOURCES = [
   {
     label: "Schule BW: Montage",
     url: "https://www.schule-bw.de/faecher-und-schularten/sprachen-und-literatur/deutsch/unterrichtseinheiten/film/filmkanon/montage"
-  },
-  {
-    label: "Schule BW: Erstrezeption",
-    url: "https://www.schule-bw.de/faecher-und-schularten/sprachen-und-literatur/deutsch/unterrichtseinheiten/film/filmanalyse"
   }
 ];
 
-const METHOD_CARDS = [
+const METHOD_MODULES = [
   {
-    title: "Erstrezeption",
-    body: "Der erste Zugriff bündelt spontane Seheindrücke, irritierende Momente und Leitfragen, bevor Details einzeln untersucht werden.",
-    bullets: ["Seheindruck sichern", "Konfliktvermutung formulieren", "erste Wirkung notieren"]
+    key: "method_erstrezeption",
+    title: "1. Erstrezeption sauber sichern",
+    intro:
+      "Die erste Notiz darf noch tastend sein, aber sie darf nicht bloss Stimmung behaupten. Sie muss mindestens einen konkreten Moment, eine Leitfrage und eine erste Hypothese enthalten.",
+    criteria: [
+      "Nenne einen genauen Moment oder eine genaue Konstellation der Folge.",
+      "Formuliere eine Leitfrage, die mit der Folge weiterarbeitet.",
+      "Begründe den Eindruck mit einem ersten Deutungssatz."
+    ],
+    prompt:
+      "Verfasse 4-5 Sätze zu deinem ersten Gesamteindruck von Folge 1 oder 2. Benenne eine auffällige Szene, formuliere eine Leitfrage und erkläre, was diese Folge nach deinem Eindruck grundsätzlich verhandelt.",
+    example:
+      "Satzanfangshilfe: Schon in der Eröffnung wirkt ... / Auffällig ist, dass ... / Daraus ergibt sich die Leitfrage ...",
+    minWords: 45,
+    requiredTerms: ["szene", "frage", "wirkt", "folge"],
+    anchorTerms: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2],
+    themeTerms: THEME_TERMS,
+    correctionTemplate:
+      "Schon in der Szene [konkreter Moment] wirkt die Folge [Adjektiv], weil [konkrete Beobachtung]. Auffällig ist, dass [Figur/Institution] hier [Handlung] und damit [Konflikt] sichtbar wird. Daraus ergibt sich die Leitfrage, ob [Leitfrage]. Insgesamt verhandelt die Folge also [Thema] und nicht bloss [Inhaltsangabe]."
   },
   {
-    title: "Visuelle Mittel",
-    body: "Die Analyse richtet den Blick auf Einstellungsgrößen, Kameraperspektive, Kamerabewegung, Licht, Farbe, Raum und Blickführung.",
-    bullets: ["Bildgröße benennen", "Raumfunktion deuten", "Blickregie und Macht lesen"]
+    key: "method_visuell",
+    title: "2. Visuelle Mittel nicht nur aufzählen",
+    intro:
+      "Eine gute Analyse benennt das Mittel und erklärt dann, was dieses Mittel in dieser konkreten Szene leistet. 'Dunkel' oder 'dramatisch' reicht nicht.",
+    criteria: [
+      "Benenne mindestens zwei filmsprachliche Begriffe.",
+      "Verknüpfe die Bildgestaltung mit Macht, Hierarchie oder Nähe/Distanz.",
+      "Formuliere in ganzen Sätzen, nicht in Stichworten."
+    ],
+    prompt:
+      "Analysiere in 4-6 Sätzen eine visuelle Konstellation aus den ersten beiden Folgen: Bildgröße, Perspektive, Licht, Raum oder Blickführung. Erkläre, welche soziale Ordnung dadurch sichtbar wird.",
+    example:
+      "Satzanfangshilfe: Die Szene arbeitet mit einer [Nahaufnahme/Totale], wodurch ... / Das Licht macht sichtbar, dass ...",
+    minWords: 50,
+    requiredTerms: FILM_TERMS,
+    anchorTerms: ["raum", "licht", "blick", "kamera", ...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2],
+    themeTerms: ["macht", "hierarchie", "status", "ordnung", "naehe", "nähe", "distanz"],
+    correctionTemplate:
+      "In der Szene [Ort/Moment] arbeitet die Folge mit [filmischem Mittel 1] und [filmischem Mittel 2]. Dadurch wirkt [Figur/Gruppe] [nah/fern/überlegen/unterlegen]. Besonders das [Licht/der Raum/die Perspektive] macht sichtbar, dass [soziale Ordnung]. Die visuelle Gestaltung zeigt also nicht nur ein Bild, sondern organisiert [Machtverhältnis]."
   },
   {
-    title: "Akustische Mittel",
-    body: "Geräusche, Sprache, Musik und Stille werden nicht dekorativ behandelt, sondern als Träger von Atmosphäre, Haltung und Konflikt.",
-    bullets: ["Geräusche isolieren", "Sprachhaltung prüfen", "Musik oder Stille deuten"]
+    key: "method_akustik",
+    title: "3. Akustische Gestaltung deuten",
+    intro:
+      "Auch Ton muss präzise beschrieben werden. Gute Analysen unterscheiden Geräusche, Sprechweise, Musik und Stille und erklären, welche Wirkung daraus entsteht.",
+    criteria: [
+      "Benenne mindestens einen akustischen Befund konkret.",
+      "Erkläre die Wirkung mit einem Kausalzusammenhang.",
+      "Verknüpfe Ton mit Konflikt oder Atmosphäre."
+    ],
+    prompt:
+      "Beschreibe in 4-5 Sätzen, wie Sprache, Geräusch, Musik oder Stille in einer Szene der Folgen 1 oder 2 Spannung oder Haltung erzeugen.",
+    example:
+      "Satzanfangshilfe: Die Szene wirkt bedrängend, weil ... / Gerade die Stille nach ... verstärkt, dass ...",
+    minWords: 40,
+    requiredTerms: ["geraeusch", "geräusch", "musik", "stille", "sprache", "stimme", "ton"],
+    anchorTerms: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2],
+    themeTerms: ["spannung", "konflikt", "macht", "angst", "druck", "härte", "haerte"],
+    correctionTemplate:
+      "Akustisch fällt in der Szene [Moment] vor allem [Geräusch/Musik/Stille/Sprechweise] auf. Das wirkt nicht zufällig, sondern verstärkt [Atmosphäre/Konflikt], weil [Kausalzusammenhang]. Gerade im Zusammenspiel mit [Figur/Situation] zeigt der Ton, dass [Deutung]."
   },
   {
-    title: "Montage",
-    body: "Schnitt und Szenenfolge ordnen Aufmerksamkeit, beschleunigen Konflikte und verknüpfen private Handlungen mit gesellschaftlichen Folgen.",
-    bullets: ["Anschlüsse beobachten", "Parallelisierung prüfen", "Rhythmus bewerten"]
+    key: "method_montage",
+    title: "4. Montage als Bedeutungssteuerung",
+    intro:
+      "Montage ist mehr als 'es wird geschnitten'. Analysiert werden muss, welche Szenenfolge hergestellt wird und welche Bedeutung erst durch diese Reihung entsteht.",
+    criteria: [
+      "Nenne mindestens zwei aufeinander bezogene Momente oder Szenen.",
+      "Beschreibe den Schnitt- oder Rhythmuseffekt.",
+      "Erkläre, welche übergeordnete Aussage daraus entsteht."
+    ],
+    prompt:
+      "Erkläre in 4-6 Sätzen, wie eine Szenenfolge oder Montage in Folge 1 oder 2 private Handlung und gesellschaftliche Dimension miteinander verknüpft.",
+    example:
+      "Satzanfangshilfe: Der Schnitt von ... zu ... bewirkt, dass ... / Erst die Reihung zeigt, wie ...",
+    minWords: 45,
+    requiredTerms: ["schnitt", "montage", "folge", "rhythmus", "parallel", "wechsel"],
+    anchorTerms: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2],
+    themeTerms: ["gesellschaft", "reich", "politik", "institution", "konflikt", "macht"],
+    correctionTemplate:
+      "Entscheidend ist die Abfolge von [Szene A] zu [Szene B]. Durch diesen Schnitt/Wechsel entsteht [Wirkung], weil beide Momente aufeinander bezogen werden. So zeigt die Montage, dass [private Handlung] immer auch mit [gesellschaftlicher Bedeutung] verbunden ist."
   }
 ];
 
@@ -54,44 +141,142 @@ const EPISODES = [
   {
     id: "ep1",
     title: "Folge 1: Barmherzigkeit",
-    hook: "Aus dem Ersten-Snippet: Ida wird als arme Patientin in die Charité eingeliefert, Ärzte müssen über sie entscheiden und parallel erschüttert die Krankheit des Kronprinzen die Ärzteschaft.",
     focus: "Einführung in Figuren, Machtverhältnisse und medizinische Hierarchien",
-    prompts: [
-      "Wie wird Ida Lenze als Figur eingeführt: als Patientin, Beobachterin oder sozialer Störfaktor?",
-      "Wie macht die Folge den Gegensatz zwischen Barmherzigkeit, Karriere und wissenschaftlichem Fortschritt sichtbar?",
-      "Welche serielle Leitfrage ist nach Folge 1 bereits etabliert?"
+    hook:
+      "Ida Lenze wird als arme Patientin in die Charité eingeliefert. Parallel konkurrieren Chirurgie, Forschung und staatspolitische Interessen um Deutungshoheit.",
+    sceneAnchors: [
+      "Idas Aufnahme: Wer spricht über sie, bevor sie selbst sprechen kann?",
+      "Appendektomie im Hörsaal: Wie wird die Patientin zum Lehrmaterial?",
+      "Kronprinz-Diskurs: Wie verschiebt die Folge vom Krankenbett zur Reichspolitik?"
     ],
-    scenes: [
-      "Idas Aufnahme und die Entscheidung über Behandlung, Geld und Status",
-      "Appendektomie im Hörsaal als Verbindung von Wissen, Spektakel und Macht",
-      "Gespräche über Kronprinz Friedrich als Brücke von Klinik zum Reich"
+    tasks: [
+      {
+        key: "ep1_figur",
+        title: "Ida Lenze als Einführung einer Serienfigur",
+        prompt:
+          "Erkläre in 4-6 Sätzen, wie Ida in Folge 1 eingeführt wird. Zeige, wie Armut, Geschlecht und Blick der Institution ihre Figur prägen.",
+        criteria: [
+          "Ida konkret benennen",
+          "mindestens eine Szene der Einführung nennen",
+          "Armut, Status oder Geschlecht deuten"
+        ],
+        minWords: 50,
+        requiredTerms: ["ida", "lenze"],
+        anchorTerms: ["aufnahme", "patientin", "charite", "hoersaal", "hörsaal", "arzt", "wärterin", "waerterin"],
+        themeTerms: ["armut", "status", "geschlecht", "macht", "hierarchie", "blick"],
+        correctionTemplate:
+          "Ida wird in Folge 1 nicht als neutrale Hauptfigur eingeführt, sondern als [Patientin/arme Frau/Beobachterin]. Schon in der Szene [Moment] zeigt sich, dass andere über sie verfügen, weil [konkrete Beobachtung]. Dadurch wird sichtbar, wie [Armut/Status/Geschlecht] ihre Position bestimmen. Genau das macht Ida als Serienfigur interessant."
+      },
+      {
+        key: "ep1_institution",
+        title: "Institutioneller Konflikt",
+        prompt:
+          "Analysiere in 4-6 Sätzen den Gegensatz von Barmherzigkeit, Karriere und Wissenschaft in Folge 1. Benenne, wer welche Logik verkörpert.",
+        criteria: [
+          "mindestens zwei Figuren oder Institutionen gegeneinander stellen",
+          "den Konflikt nicht nur aufzählen, sondern deuten",
+          "zeigen, warum dieser Konflikt seriell tragfähig ist"
+        ],
+        minWords: 55,
+        requiredTerms: ["konflikt", "wissenschaft", "barmherzigkeit", "karriere"],
+        anchorTerms: ["bering", "ehrlich", "koch", "virchow", "pflege", "charite", "hoersaal", "hörsaal"],
+        themeTerms: ["macht", "hierarchie", "ordnung", "medizin", "institution"],
+        correctionTemplate:
+          "Folge 1 stellt [Figur/Institution A] und [Figur/Institution B] gegeneinander. Während [A] vor allem [Logik 1] vertritt, steht [B] für [Logik 2]. In der Szene [Moment] wird dieser Gegensatz sichtbar, weil [Beobachtung]. Daraus entsteht ein Dauerkonflikt zwischen [Werten/Interessen]."
+      },
+      {
+        key: "ep1_serie",
+        title: "Serielle Leitfrage",
+        prompt:
+          "Formuliere in 4-5 Sätzen, welche serielle Leitfrage die erste Folge eröffnet und warum diese nicht schon am Ende von Folge 1 erledigt ist.",
+        criteria: [
+          "eine klare Leitfrage formulieren",
+          "mindestens ein offenes Konfliktmoment nennen",
+          "die Serienfunktion ausdrücklich benennen"
+        ],
+        minWords: 45,
+        requiredTerms: ["frage", "folge", "serie", "offen"],
+        anchorTerms: [...EPISODE_ANCHORS.ep1],
+        themeTerms: ["konflikt", "entwicklung", "macht", "wissenschaft", "pflege"],
+        correctionTemplate:
+          "Die Folge eröffnet die serielle Leitfrage, ob [Leitfrage]. Diese Frage bleibt offen, weil [offenes Konfliktmoment] am Ende nicht gelöst ist. Gerade darin liegt die Serienfunktion: In weiteren Folgen kann sich zeigen, wie [Figur/Institution] auf diesen Dauerkonflikt reagiert."
+      }
     ],
     links: [
       {
-        label: "Folge 1 bei Das Erste",
-        url: "https://www.daserste.de/unterhaltung/serie/charite/sendung-staffel-1/charite-folge-1-folge-1-barmherzigkeit-100.html"
+        label: "Folge 1 in Dropbox",
+        url: "https://www.dropbox.com/scl/fi/e42zk5vr0iicc291ebj8v/Folge-1-Barmherzigkeit-S01E01.mp4?rlkey=etck8r642javgz2habtl2lc5e&st=r4nt04m0&dl=0"
       }
     ]
   },
   {
     id: "ep2",
     title: "Folge 2: Kaiserwetter",
-    hook: "Aus dem Ersten-Snippet: Ida beginnt als Hilfswärterin, Therese träumt vom Medizinstudium und Robert Koch forscht mit seinen Assistenten an einem Heilmittel gegen Tuberkulose.",
     focus: "Vertiefung von Forschungsdrama, Geschlechterordnung und institutioneller Gewalt",
-    prompts: [
-      "Wie verbindet die Folge Pflegealltag, Forschung und politische Repräsentation?",
-      "Wie werden Therese, Ida, Bering und Koch als Figuren mit gegensätzlichen Interessen weiterentwickelt?",
-      "Welche Konflikte tragen mehrere Folgen und öffnen damit die Serie nach vorne?"
+    hook:
+      "Ida arbeitet nun in der Charité, Therese denkt über ein Medizinstudium nach und Forschung, Pflege und Politik geraten noch direkter aneinander.",
+    sceneAnchors: [
+      "Tuberkulose- und Diphtherie-Szenen: Wie erzeugt die Folge Entscheidungsdruck?",
+      "Therese und Studium: Wie wird Geschlechterordnung sichtbar?",
+      "Kaiserbesuch im Labor: Wie wird Wissenschaft politisch inszeniert?"
     ],
-    scenes: [
-      "Tuberkulose- und Diphtherie-Szenen als Druckraum für Entscheidungen",
-      "Tischendorfs Unsicherheit und Berings Härte in der Lehrsituation",
-      "Kaiserbesuch und Labor als politische Bühne der Wissenschaft"
+    tasks: [
+      {
+        key: "ep2_pflege_forschung",
+        title: "Pflege, Forschung und Politik verschränken",
+        prompt:
+          "Erkläre in 4-6 Sätzen, wie Folge 2 Pflegealltag, Forschung und politische Repräsentation aufeinander bezieht. Zeige mindestens zwei Übergänge zwischen diesen Ebenen.",
+        criteria: [
+          "mindestens zwei Ebenen konkret verbinden",
+          "eine Szene aus Pflege/Forschung und eine aus dem politischen Bereich nennen",
+          "den Zusammenhang deuten"
+        ],
+        minWords: 55,
+        requiredTerms: ["pflege", "forschung", "politik"],
+        anchorTerms: ["ida", "therese", "koch", "bering", "kaiser", "labor", "station", "tuberkulose", "diphtherie"],
+        themeTerms: ["macht", "institution", "ordnung", "status", "wissenschaft"],
+        correctionTemplate:
+          "Folge 2 verbindet [Pflegeszene] und [Forschungs-/Politikszene] gezielt miteinander. Dadurch wird sichtbar, dass [Pflege/Forschung/Politik] nicht getrennte Bereiche sind, sondern sich gegenseitig bestimmen. In der Szene [Moment] zeigt sich das besonders deutlich, weil [Beobachtung]."
+      },
+      {
+        key: "ep2_figuren",
+        title: "Figurenachsen zuspitzen",
+        prompt:
+          "Untersuche in 4-6 Sätzen, wie Folge 2 die Figurenachsen von Therese, Ida, Bering oder Tischendorf verschärft. Entscheide dich für mindestens zwei Figuren.",
+        criteria: [
+          "mindestens zwei Figuren ausdrücklich vergleichen",
+          "Interessen oder Ziele benennen",
+          "zeigen, wie daraus weiterer Konflikt entsteht"
+        ],
+        minWords: 50,
+        requiredTerms: ["figur", "ziel", "konflikt"],
+        anchorTerms: ["therese", "ida", "bering", "tischendorf", "koch"],
+        themeTerms: ["geschlecht", "status", "haerte", "härte", "empathie", "wissenschaft", "pflege"],
+        correctionTemplate:
+          "[Figur A] verfolgt in Folge 2 [Ziel], während [Figur B] auf [Gegenziel/Haltung] festgelegt wird. In der Szene [Moment] prallen diese Achsen aufeinander. Dadurch verschärft die Folge nicht nur den Einzelkonflikt, sondern bereitet [weiteren Dauerkonflikt] vor."
+      },
+      {
+        key: "ep2_seriell",
+        title: "Warum Folge 2 das Weitersehen erzwingt",
+        prompt:
+          "Formuliere in 4-5 Sätzen, welche offenen Konflikte Folge 2 so anlegt, dass die Serie nach vorne geöffnet wird.",
+        criteria: [
+          "mindestens zwei offene Konflikte nennen",
+          "deren Zukunftspotenzial erklären",
+          "die serielle Funktion ausdrücklich benennen"
+        ],
+        minWords: 45,
+        requiredTerms: ["offen", "folge", "serie"],
+        anchorTerms: ["therese", "ida", "bering", "koch", "kaiser", "labor"],
+        themeTerms: ["entwicklung", "konflikt", "staffel", "wiederkehr", "ordnung"],
+        correctionTemplate:
+          "Folge 2 zwingt zum Weitersehen, weil [Konflikt 1] und [Konflikt 2] bewusst offen bleiben. Diese Konflikte tragen seriell, da sie in späteren Folgen weiter eskalieren koennen: [kurze Erklärung]. Genau dadurch wird aus Einzelhandlung eine Staffelachse."
+      }
     ],
     links: [
       {
-        label: "Folge 2 bei Das Erste",
-        url: "https://www.daserste.de/unterhaltung/serie/charite/sendung-staffel-1/charite-folge-2-folge-2-kaiserwetter-100.html"
+        label: "Folge 2 in Dropbox",
+        url: "https://www.dropbox.com/scl/fi/anohh9fcbs75yp1bxxfrt/Folge-2-Kaiserwetter-S01E02.mp4?rlkey=rj0pbmebj7blwlvtjfgrf254f&st=nvos969x&dl=0"
       }
     ]
   }
@@ -99,102 +284,84 @@ const EPISODES = [
 
 const MATRIX_ROWS = [
   {
-    key: "firstImpression",
-    title: "Erstrezeption und Leitfrage",
-    prompt: "Welche erste Gesamtwirkung erzeugt die Folge und welche Leitfrage drängt sich auf?",
-    observationHint: "Konkrete Seheindrücke, irritierende Momente, auffällige Kontraste",
-    mediumHint: "z. B. Eröffnung, Bildaufbau, Tempo, Kontrast von Räumen",
-    effectHint: "Was zeigt die Folge damit über Welt, Konflikt oder Haltung?",
-    conceptHint: "Welche Leitfrage könnte eure eigene Serie ähnlich stark eröffnen?",
-    keywords: ["eröffnung", "kontrast", "welt", "leitfrage", "tempo", "eindruck"]
+    key: "opening",
+    title: "Eröffnung und Leitfrage",
+    prompt: "Wie setzt die Folge ihre Grundspannung bereits in der Eröffnung oder in einem sehr frühen Schlüsselbild?",
+    observationHint: "Konkreter Eröffnungsmoment, Figuren, Raum oder Handlung",
+    mediumHint: "Filmisches Mittel: Bildgröße, Perspektive, Raum, Licht, Ton oder Montage",
+    effectHint: "Was zeigt das über Macht, Konflikt, Haltung oder Welt?",
+    serialHint: "Warum ist diese Eröffnung seriell tragfähig und nicht bloß Auftakt einer Einzelepisode?",
+    mediumTerms: ["eröffnung", "totale", "nahaufnahme", "kamera", "licht", "raum", "ton", "schnitt"],
+    themeTerms: ["macht", "ordnung", "hierarchie", "konflikt", "welt"],
+    anchors: ["eroeffnung", "eröffnung", ...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2]
   },
   {
-    key: "figures",
-    title: "Figuren und Konflikt",
-    prompt: "Welche Figur will was, wer blockiert sie und wie wird das als Konflikt organisiert?",
-    observationHint: "mindestens eine Figur + ein konkreter Konfliktmoment",
-    mediumHint: "z. B. Blickführung, Nahaufnahme, Dialog, Gegenschnitt",
-    effectHint: "Wie verschiebt sich Sympathie, Macht oder Wissen?",
-    conceptHint: "Was lernt ihr daraus für Protagonist:in, Antagonismus und Konfliktnetz?",
-    keywords: ["nahaufnahme", "dialog", "blick", "gegen", "ziel", "widerstand", "konflikt"]
+    key: "figureConflict",
+    title: "Figurenziel und Widerstand",
+    prompt: "Welche Figur will etwas, wer blockiert sie und wie macht die Folge diesen Widerstand sichtbar?",
+    observationHint: "Figur, Ziel, Gegenkraft, Schlüsselmoment",
+    mediumHint: "Nahaufnahme, Gegenschnitt, Dialog, Blickführung, Distanz, Raumordnung",
+    effectHint: "Welche Hierarchie oder Sympathielenkung entsteht?",
+    serialHint: "Wie wird daraus eine Konfliktachse für weitere Folgen?",
+    mediumTerms: ["nahaufnahme", "dialog", "gegenschnitt", "blick", "raum", "distanz", "kamera"],
+    themeTerms: ["ziel", "widerstand", "macht", "sympathie", "hierarchie", "konflikt"],
+    anchors: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2]
   },
   {
-    key: "spaceVisual",
-    title: "Raum, Bild und Macht",
-    prompt: "Wie erzählen Raum, Licht, Farbe und Kadrierung soziale Ordnung?",
-    observationHint: "konkreter Ort, Bildwirkung, räumliche Anordnung",
-    mediumHint: "z. B. Totale, Halbtotale, Aufsicht, Licht, Farbe, Tiefe",
-    effectHint: "Wie wird Macht räumlich sichtbar gemacht?",
-    conceptHint: "Welche Raumregel soll eure eigene Serie übernehmen oder variieren?",
-    keywords: ["totale", "halbtotale", "licht", "farbe", "raum", "aufsicht", "untersicht", "kadrierung"]
+    key: "spacePower",
+    title: "Raum als soziale Ordnung",
+    prompt: "Wie erzählt ein Raum der Folge soziale Ordnung, Ausschluss oder Überlegenheit?",
+    observationHint: "Nenne den genauen Raum und was dort geschieht",
+    mediumHint: "Totale, Halbtotale, Aufsicht, Licht, Wege, Kadrierung",
+    effectHint: "Welche gesellschaftliche Ordnung wird dadurch sichtbar?",
+    serialHint: "Warum kann dieser Raum in der Serie immer wieder Konflikte produzieren?",
+    mediumTerms: ["totale", "halbtotale", "aufsicht", "untersicht", "licht", "kadrierung", "raum"],
+    themeTerms: ["ordnung", "ausschluss", "hierarchie", "status", "institution"],
+    anchors: ["charite", "labor", "hoersaal", "hörsaal", "station", "operationssaal", "zimmer"]
   },
   {
-    key: "cameraMovement",
-    title: "Kamera und Blickregie",
-    prompt: "Wie steuert die Kamera Aufmerksamkeit, Nähe und Distanz?",
-    observationHint: "konkrete Bewegung oder Perspektive nennen",
-    mediumHint: "z. B. Kamerafahrt, Schwenk, Perspektive, Einstellungsgröße",
-    effectHint: "Warum fühlt sich die Szene so kontrolliert, hektisch oder bedrängend an?",
-    conceptHint: "Welche Kameraregel würde eurer eigenen Serie eine klare Haltung geben?",
-    keywords: ["kamera", "perspektive", "schwenk", "fahrt", "nah", "totale", "einstellung"]
+    key: "soundRhythm",
+    title: "Ton, Geräusch und Druck",
+    prompt: "Wie arbeiten Ton und Geräusch mit, damit Situationen bedrängend, kalt oder konflikthaft wirken?",
+    observationHint: "Konkretes Geräusch, Sprechweise, Musik oder Stille",
+    mediumHint: "Sprache, Geräusch, Stille, Musik, Geräuschkulisse, Rhythmus",
+    effectHint: "Welche Atmosphäre oder Haltung entsteht daraus?",
+    serialHint: "Welche wiedererkennbare Tonlogik lässt sich für die Serie erkennen?",
+    mediumTerms: ["geraeusch", "geräusch", "musik", "stille", "sprache", "stimme", "ton", "rhythmus"],
+    themeTerms: ["druck", "angst", "haerte", "härte", "ordnung", "konflikt"],
+    anchors: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2]
   },
   {
-    key: "sound",
-    title: "Akustische Gestaltung",
-    prompt: "Welche Rolle spielen Sprache, Geräusche, Musik oder Stille?",
-    observationHint: "Tonmoment benennen, nicht nur allgemein 'dramatisch'",
-    mediumHint: "z. B. Geräuschkulisse, Sprechweise, Musik, Stille",
-    effectHint: "Wie beeinflusst der Ton Atmosphäre, Spannung oder Deutung?",
-    conceptHint: "Welche Tonregel sollte eure Serie wiedererkennbar machen?",
-    keywords: ["geräusch", "musik", "stille", "sprache", "stimme", "ton", "kulisse"]
+    key: "montagePolitics",
+    title: "Montage zwischen Privatfall und großer Geschichte",
+    prompt: "Wo verbindet die Folge einen privaten Konflikt mit einer größeren institutionellen oder politischen Dimension?",
+    observationHint: "Mindestens zwei aufeinander bezogene Momente nennen",
+    mediumHint: "Schnitt, Montage, Parallelisierung, Szenenfolge, Rhythmus",
+    effectHint: "Welche Aussage entsteht erst durch die Reihung?",
+    serialHint: "Wie öffnet diese Verknüpfung die Serie auf weitere gesellschaftliche Konflikte?",
+    mediumTerms: ["schnitt", "montage", "parallel", "wechsel", "folge", "rhythmus"],
+    themeTerms: ["politik", "reich", "staat", "institution", "gesellschaft", "macht"],
+    anchors: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2]
   },
   {
-    key: "montage",
-    title: "Montage und Erzählrhythmus",
-    prompt: "Wie verknüpfen Schnitt und Szenenfolge private Handlung und gesellschaftliche Bedeutung?",
-    observationHint: "Schnittfolge, Parallelisierung oder Rhythmus benennen",
-    mediumHint: "z. B. Montage, Parallelmontage, Schnitt, Rhythmus",
-    effectHint: "Welche Bedeutung entsteht erst durch die Anordnung der Szenen?",
-    conceptHint: "Wie soll eure eigene Serie zwischen persönlichem Konflikt und großer Welt schneiden?",
-    keywords: ["montage", "schnitt", "parallel", "rhythmus", "folge", "wechsel"]
-  },
-  {
-    key: "seriality",
-    title: "Serielle Anlage",
-    prompt: "Was in der Folge trägt über die Einzelszene hinaus und macht daraus eine Serie?",
-    observationHint: "offene Konflikte, wiederkehrende Dilemmata, Figurenachsen",
-    mediumHint: "z. B. Cliffhanger, Staffelkonflikt, wiederkehrende Konstellation",
-    effectHint: "Warum erzeugt die Folge das Bedürfnis weiterzusehen?",
-    conceptHint: "Welche Engine soll eure eigene Serie über mehrere Episoden tragen?",
-    keywords: ["cliffhanger", "staffel", "episode", "serie", "achse", "wiederkehr", "engine"]
+    key: "serialCore",
+    title: "Serielle Kernspannung",
+    prompt: "Was ist nach dieser Folge noch nicht gelöst und warum trägt genau das mehrere Episoden?",
+    observationHint: "Offener Konflikt, ungelöste Frage, Figurendilemma",
+    mediumHint: "Cliffhanger, offene Szenenfolge, wiederkehrende Konstellation, Blick in die Zukunft",
+    effectHint: "Welche Erwartungshaltung wird beim Publikum aufgebaut?",
+    serialHint: "Erkläre ausdrücklich, warum dies serielle und nicht bloß episodische Spannung ist.",
+    mediumTerms: ["cliffhanger", "offen", "folge", "staffel", "wiederkehr", "konstellation"],
+    themeTerms: ["entwicklung", "dauerkonflikt", "staffel", "serie", "wiederkehr"],
+    anchors: [...EPISODE_ANCHORS.ep1, ...EPISODE_ANCHORS.ep2]
   }
 ];
 
-const CONCEPT_FIELDS = [
-  {
-    key: "premise",
-    label: "Serienprämisse",
-    hint: "Formuliert in 2-4 Sätzen: Worum geht es, welcher Konflikt steht im Zentrum und warum trägt er eine Serie?",
-    keywords: ["konflikt", "serie", "welt", "figur", "dilemma", "entscheidung"]
-  },
-  {
-    key: "protagonist",
-    label: "Hauptfigur und Gegenspiel",
-    hint: "Wer ist die Hauptfigur, was will sie, was blockiert sie und welche Gegenkraft ist dauerhaft wirksam?",
-    keywords: ["hauptfigur", "ziel", "gegner", "widerstand", "angst", "institution"]
-  },
-  {
-    key: "engine",
-    label: "Serielle Engine",
-    hint: "Welche wiederkehrende Entscheidung, welches Dilemma oder welche Arbeitswelt produziert immer neue Episoden?",
-    keywords: ["episode", "staffel", "wiederkehr", "entscheidung", "dilemma", "konsequenz"]
-  },
-  {
-    key: "style",
-    label: "Visuelle und akustische Handschrift",
-    hint: "Welche Regeln zu Kamera, Raum, Licht, Geräusch, Musik oder Stille strukturieren eure Serie?",
-    keywords: ["kamera", "licht", "raum", "geräusch", "musik", "stille", "farbe"]
-  }
+const TAKEAWAYS = [
+  "Gute Filmanalyse beginnt nicht mit Wertungen, sondern mit präziser Beobachtung eines konkreten Moments.",
+  "Ein filmisches Mittel ist erst dann analysiert, wenn seine Wirkung auf Konflikt, Macht, Haltung oder Figurenbeziehung erklärt wird.",
+  "Serielle Analyse fragt immer mit: Was bleibt offen, was wiederholt sich, was trägt mehrere Folgen?",
+  "Besonders tragfähig für spätere Serienkonzeptionen sind Befunde zu Dauerkonflikten, Räumen mit Konfliktpotenzial und wiederkehrenden audiovisuellen Regeln."
 ];
 
 const state = loadState();
@@ -208,20 +375,23 @@ function init() {
   renderEpisodeCards();
   renderEpisodeSwitch();
   renderMatrix();
-  renderConceptFields();
+  renderTakeaways();
   renderGlobalFeedback();
   bindActions();
 }
 
 function createInitialState() {
   return {
+    method: Object.fromEntries(METHOD_MODULES.map((module) => [module.key, ""])),
+    focus: Object.fromEntries(
+      EPISODES.map((episode) => [episode.id, Object.fromEntries(episode.tasks.map((task) => [task.key, ""]))])
+    ),
     matrix: Object.fromEntries(
       EPISODES.map((episode) => [
         episode.id,
-        Object.fromEntries(MATRIX_ROWS.map((row) => [row.key, { observation: "", medium: "", effect: "", concept: "" }]))
+        Object.fromEntries(MATRIX_ROWS.map((row) => [row.key, { observation: "", medium: "", effect: "", serial: "" }]))
       ])
-    ),
-    concept: Object.fromEntries(CONCEPT_FIELDS.map((field) => [field.key, ""]))
+    )
   };
 }
 
@@ -230,7 +400,7 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return createInitialState();
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? mergeState(parsed) : createInitialState();
+    return mergeState(parsed);
   } catch (error) {
     return createInitialState();
   }
@@ -238,7 +408,13 @@ function loadState() {
 
 function mergeState(parsed) {
   const initial = createInitialState();
+  METHOD_MODULES.forEach((module) => {
+    initial.method[module.key] = String(parsed?.method?.[module.key] || "");
+  });
   EPISODES.forEach((episode) => {
+    episode.tasks.forEach((task) => {
+      initial.focus[episode.id][task.key] = String(parsed?.focus?.[episode.id]?.[task.key] || "");
+    });
     MATRIX_ROWS.forEach((row) => {
       const next = parsed?.matrix?.[episode.id]?.[row.key];
       if (next && typeof next === "object") {
@@ -246,13 +422,10 @@ function mergeState(parsed) {
           observation: String(next.observation || ""),
           medium: String(next.medium || ""),
           effect: String(next.effect || ""),
-          concept: String(next.concept || "")
+          serial: String(next.serial || "")
         };
       }
     });
-  });
-  CONCEPT_FIELDS.forEach((field) => {
-    initial.concept[field.key] = String(parsed?.concept?.[field.key] || "");
   });
   return initial;
 }
@@ -270,22 +443,20 @@ function renderSourceStrip() {
 
 function renderMethodCards() {
   const box = document.getElementById("method-grid");
-  box.innerHTML = METHOD_CARDS.map(
-    (card) => `
-      <article class="method-card">
-        <h3>${escapeHtml(card.title)}</h3>
-        <p>${escapeHtml(card.body)}</p>
-        <ul>${card.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul>
-      </article>
-    `
-  ).join("");
+  box.innerHTML = METHOD_MODULES.map((module) => renderStandaloneTaskCard("method", module.key, module, state.method[module.key])).join("");
+  bindDynamicInputs();
+  bindSuggestionButtons();
 }
 
 function renderEpisodeCards() {
   const box = document.getElementById("episode-grid");
-  box.innerHTML = EPISODES.map(
-    (episode) => `
-      <article class="episode-card">
+  box.innerHTML = EPISODES.map((episode) => {
+    const taskHtml = episode.tasks
+      .map((task) => renderStandaloneTaskCard("focus", `${episode.id}:${task.key}`, task, state.focus[episode.id][task.key]))
+      .join("");
+
+    return `
+      <article class="episode-card episode-card-dense">
         <header>
           <div>
             <h3>${escapeHtml(episode.title)}</h3>
@@ -293,22 +464,60 @@ function renderEpisodeCards() {
           </div>
         </header>
         <p>${escapeHtml(episode.hook)}</p>
-        <ul>${episode.scenes.map((scene) => `<li>${escapeHtml(scene)}</li>`).join("")}</ul>
-        <ul>${episode.prompts.map((prompt) => `<li>${escapeHtml(prompt)}</li>`).join("")}</ul>
+        <div class="support-box">
+          <strong>Beobachtungsschneisen</strong>
+          <ul>${episode.sceneAnchors.map((anchor) => `<li>${escapeHtml(anchor)}</li>`).join("")}</ul>
+        </div>
         <div class="episode-links">
           ${episode.links.map((link) => `<a class="source-pill" href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(link.label)}</a>`).join("")}
         </div>
+        <div class="task-stack">${taskHtml}</div>
       </article>
-    `
-  ).join("");
+    `;
+  }).join("");
+  bindDynamicInputs();
+  bindSuggestionButtons();
+}
+
+function renderStandaloneTaskCard(kind, id, task, value) {
+  const evaluation = evaluateStandaloneTask(task, value);
+  const domId = sanitizeId(`${kind}-${id}`);
+  return `
+    <article class="task-card" data-task-card="${domId}">
+      <div class="task-head">
+        <div>
+          <h4>${escapeHtml(task.title)}</h4>
+          <p>${escapeHtml(task.intro || task.prompt)}</p>
+        </div>
+        <span class="status-badge ${evaluation.tone}" data-task-status="${domId}">${escapeHtml(evaluation.label)}</span>
+      </div>
+      <div class="support-box">
+        <strong>Arbeitsauftrag</strong>
+        <p>${escapeHtml(task.prompt)}</p>
+        <ul>${(task.criteria || []).map((criterion) => `<li>${escapeHtml(criterion)}</li>`).join("")}</ul>
+        ${task.example ? `<p class="support-example">${escapeHtml(task.example)}</p>` : ""}
+      </div>
+      <label>
+        Freitextantwort
+        <textarea data-standalone-kind="${kind}" data-standalone-id="${id}" placeholder="${escapeHtml(task.prompt)}">${escapeHtml(value || "")}</textarea>
+      </label>
+      <div class="task-tools">
+        <button type="button" class="ghost helper-button" data-suggest-standalone="${kind}:${id}">Korrekturhilfe anzeigen</button>
+      </div>
+      <div class="feedback-block ${evaluation.tone}" data-task-feedback="${domId}">
+        ${renderFeedbackInner(evaluation)}
+      </div>
+      <div class="suggestion-box" data-task-suggestion="${domId}"></div>
+    </article>
+  `;
 }
 
 function renderEpisodeSwitch() {
   const box = document.getElementById("episode-switch");
   box.innerHTML = EPISODES.map((episode) => {
     const activeClass = episode.id === activeEpisodeId ? "active" : "";
-    const score = getEpisodeScore(episode.id);
-    return `<button type="button" class="episode-tab ${activeClass}" data-episode-tab="${episode.id}" role="tab" aria-selected="${episode.id === activeEpisodeId}">${escapeHtml(episode.title)} · ${score}%</button>`;
+    const summary = summarizeMatrixEpisode(episode.id);
+    return `<button type="button" class="episode-tab ${activeClass}" data-episode-tab="${episode.id}" role="tab" aria-selected="${episode.id === activeEpisodeId}">${escapeHtml(episode.title)} · ${summary.label}</button>`;
   }).join("");
 
   box.querySelectorAll("[data-episode-tab]").forEach((button) => {
@@ -323,321 +532,584 @@ function renderEpisodeSwitch() {
 function renderMatrix() {
   const box = document.getElementById("matrix-panel");
   const episode = EPISODES.find((entry) => entry.id === activeEpisodeId);
-  const score = getEpisodeScore(activeEpisodeId);
+  const summary = summarizeMatrixEpisode(activeEpisodeId);
 
   box.innerHTML = `
     <div class="matrix-meta">
       <span>Aktive Folge: ${escapeHtml(episode.title)}</span>
-      <span>Fortschritt: ${score}%</span>
-      <span>Fokus: ${escapeHtml(episode.focus)}</span>
+      <span>Qualitätsstand: ${escapeHtml(summary.label)}</span>
+      <span>${escapeHtml(summary.detail)}</span>
     </div>
     <div class="matrix-grid">
-      ${MATRIX_ROWS.map((row) => renderRowCard(activeEpisodeId, row)).join("")}
+      ${MATRIX_ROWS.map((row) => renderMatrixRow(activeEpisodeId, row)).join("")}
     </div>
   `;
 
-  box.querySelectorAll("textarea[data-episode]").forEach((area) => {
+  box.querySelectorAll("textarea[data-matrix-episode]").forEach((area) => {
     area.addEventListener("input", onMatrixInput);
   });
+  bindSuggestionButtons();
 }
 
-function renderRowCard(episodeId, row) {
+function renderMatrixRow(episodeId, row) {
   const value = state.matrix[episodeId][row.key];
-  const evaluation = evaluateRow(row, value);
+  const evaluation = evaluateMatrixRow(episodeId, row, value);
+  const rowId = sanitizeId(`${episodeId}-${row.key}`);
   return `
-    <article class="row-card" data-row-card="${row.key}">
+    <article class="row-card" data-row-card="${rowId}">
       <div class="row-head">
         <div>
           <h3>${escapeHtml(row.title)}</h3>
           <p>${escapeHtml(row.prompt)}</p>
         </div>
-        <span class="status-badge ${evaluation.tone}" data-row-status="${row.key}">${escapeHtml(evaluation.label)}</span>
+        <span class="status-badge ${evaluation.tone}" data-row-status="${rowId}">${escapeHtml(evaluation.label)}</span>
       </div>
       <div class="field-grid">
         ${renderMatrixField(episodeId, row, "observation", "Beobachtung", row.observationHint, value.observation)}
         ${renderMatrixField(episodeId, row, "medium", "Filmisches Mittel", row.mediumHint, value.medium)}
         ${renderMatrixField(episodeId, row, "effect", "Wirkung / Deutung", row.effectHint, value.effect)}
-        ${renderMatrixField(episodeId, row, "concept", "Anschluss an Serienkonzeption", row.conceptHint, value.concept)}
+        ${renderMatrixField(episodeId, row, "serial", "Serielle Funktion", row.serialHint, value.serial)}
       </div>
-      <div class="row-feedback" data-row-feedback="${row.key}">${evaluation.messages.map((message) => `<div class="feedback-block ${evaluation.tone}"><p>${escapeHtml(message)}</p></div>`).join("")}</div>
+      <div class="row-feedback" data-row-feedback="${rowId}">
+        ${renderFeedbackBlockCollection(evaluation)}
+      </div>
     </article>
   `;
 }
 
 function renderMatrixField(episodeId, row, field, label, hint, value) {
-  const micro = evaluateField(row, field, value);
+  const evaluation = evaluateMatrixField(episodeId, row, field, value);
+  const fieldId = sanitizeId(`${episodeId}-${row.key}-${field}`);
   return `
-    <label>
+    <label class="matrix-field">
       ${escapeHtml(label)}
       <textarea
-        data-episode="${episodeId}"
-        data-row="${row.key}"
-        data-field="${field}"
+        data-matrix-episode="${episodeId}"
+        data-matrix-row="${row.key}"
+        data-matrix-field="${field}"
         placeholder="${escapeHtml(hint)}"
       >${escapeHtml(value || "")}</textarea>
-      <div class="micro-feedback" data-micro="${row.key}:${field}"><strong>${escapeHtml(micro.title)}:</strong> ${escapeHtml(micro.text)}</div>
+      <div class="task-tools">
+        <button type="button" class="ghost helper-button" data-suggest-matrix="${episodeId}:${row.key}:${field}">Korrekturhilfe anzeigen</button>
+      </div>
+      <div class="feedback-block ${evaluation.tone}" data-matrix-feedback="${fieldId}">
+        ${renderFeedbackInner(evaluation)}
+      </div>
+      <div class="suggestion-box" data-matrix-suggestion="${fieldId}"></div>
     </label>
   `;
 }
 
-function renderConceptFields() {
-  const box = document.getElementById("concept-grid");
-  box.innerHTML = CONCEPT_FIELDS.map((field) => {
-    const value = state.concept[field.key];
-    const micro = evaluateConceptField(field, value);
-    return `
-      <label class="concept-field">
-        <h3>${escapeHtml(field.label)}</h3>
-        <p>${escapeHtml(field.hint)}</p>
-        <textarea data-concept="${field.key}" placeholder="${escapeHtml(field.hint)}">${escapeHtml(value)}</textarea>
-        <div class="micro-feedback" data-concept-micro="${field.key}"><strong>${escapeHtml(micro.title)}:</strong> ${escapeHtml(micro.text)}</div>
-      </label>
-    `;
-  }).join("");
-
-  box.querySelectorAll("textarea[data-concept]").forEach((area) => {
-    area.addEventListener("input", onConceptInput);
-  });
-
-  renderConceptFeedback();
-}
-
-function renderConceptFeedback() {
-  const box = document.getElementById("concept-feedback");
-  const evaluation = evaluateConcept();
-  box.innerHTML = evaluation.messages
-    .map((message) => `<div class="feedback-block ${evaluation.tone}"><p>${escapeHtml(message)}</p></div>`)
-    .join("");
+function renderTakeaways() {
+  const box = document.getElementById("takeaway-grid");
+  box.innerHTML = TAKEAWAYS.map(
+    (item) => `<article class="takeaway-card"><p>${escapeHtml(item)}</p></article>`
+  ).join("");
 }
 
 function renderGlobalFeedback() {
   const box = document.getElementById("global-feedback");
-  const episodeCards = EPISODES.map((episode) => {
-    const score = getEpisodeScore(episode.id);
-    const tone = score >= 75 ? "good" : score >= 45 ? "medium" : "weak";
-    const text =
-      score >= 75
-        ? "Die Matrix arbeitet schon interpretierend und verbindet Filmmittel mit Serienkonzept."
-        : score >= 45
-          ? "Die Analyse ist angelegt, braucht aber an mehreren Stellen präzisere Begriffe und stärkere Deutungen."
-          : "Noch dominieren Stichworte. Mehr konkrete Beobachtung und klar benannte filmische Mittel sind nötig.";
-    return `<div class="feedback-chip ${tone}"><strong>${escapeHtml(episode.title)} · ${score}%</strong>${escapeHtml(text)}</div>`;
-  }).join("");
+  const methodStats = summarizeStandaloneGroup(METHOD_MODULES, "method");
+  const focusStats = summarizeFocusGroup();
+  const matrixStats = summarizeMatrixAll();
 
-  const concept = evaluateConcept();
-  box.innerHTML = episodeCards + `<div class="feedback-chip ${concept.tone}"><strong>Eigene Serie</strong>${escapeHtml(concept.summary)}</div>`;
+  const priorities = collectPriorities().slice(0, 4);
+
+  box.innerHTML = `
+    <div class="feedback-chip ${methodStats.tone}">
+      <strong>Methodischer Rahmen</strong>
+      ${escapeHtml(methodStats.summary)}
+    </div>
+    <div class="feedback-chip ${focusStats.tone}">
+      <strong>Folgen im Fokus</strong>
+      ${escapeHtml(focusStats.summary)}
+    </div>
+    <div class="feedback-chip ${matrixStats.tone}">
+      <strong>Interpretationsmatrix</strong>
+      ${escapeHtml(matrixStats.summary)}
+    </div>
+    <div class="feedback-chip ${priorities.length === 0 ? "good" : "medium"}">
+      <strong>Nächste Prioritäten</strong>
+      ${priorities.length === 0 ? "Die Einheit ist in allen Kernbereichen bereits qualifiziert bearbeitet." : escapeHtml(priorities.join(" | "))}
+    </div>
+  `;
 }
 
 function bindActions() {
   document.getElementById("reset-state").addEventListener("click", () => {
     if (!window.confirm("Alle Eingaben in dieser Einheit wirklich löschen?")) return;
     const next = createInitialState();
+    state.method = next.method;
+    state.focus = next.focus;
     state.matrix = next.matrix;
-    state.concept = next.concept;
     saveState();
+    renderMethodCards();
+    renderEpisodeCards();
     renderEpisodeSwitch();
     renderMatrix();
-    renderConceptFields();
     renderGlobalFeedback();
+    bindDynamicInputs();
+    bindSuggestionButtons();
   });
 
-  document.getElementById("export-markdown").addEventListener("click", () => {
-    exportMarkdown();
+  document.getElementById("export-markdown").addEventListener("click", exportMarkdown);
+  bindDynamicInputs();
+  bindSuggestionButtons();
+}
+
+function bindDynamicInputs() {
+  document.querySelectorAll("textarea[data-standalone-kind]").forEach((area) => {
+    area.oninput = onStandaloneInput;
   });
+  document.querySelectorAll("textarea[data-matrix-episode]").forEach((area) => {
+    area.oninput = onMatrixInput;
+  });
+}
+
+function bindSuggestionButtons() {
+  document.querySelectorAll("[data-suggest-standalone]").forEach((button) => {
+    button.onclick = onStandaloneSuggest;
+  });
+  document.querySelectorAll("[data-suggest-matrix]").forEach((button) => {
+    button.onclick = onMatrixSuggest;
+  });
+  document.querySelectorAll("[data-apply-suggestion]").forEach((button) => {
+    button.onclick = onApplySuggestion;
+  });
+}
+
+function onStandaloneInput(event) {
+  const kind = event.target.dataset.standaloneKind;
+  const id = event.target.dataset.standaloneId;
+  const value = event.target.value;
+
+  if (kind === "method") {
+    state.method[id] = value;
+    updateStandaloneCard("method", id);
+  } else {
+    const [episodeId, taskKey] = id.split(":");
+    state.focus[episodeId][taskKey] = value;
+    updateStandaloneCard("focus", id);
+  }
+
+  saveState();
+  renderEpisodeSwitch();
+  renderGlobalFeedback();
 }
 
 function onMatrixInput(event) {
-  const episodeId = event.target.dataset.episode;
-  const rowKey = event.target.dataset.row;
-  const field = event.target.dataset.field;
+  const episodeId = event.target.dataset.matrixEpisode;
+  const rowKey = event.target.dataset.matrixRow;
+  const field = event.target.dataset.matrixField;
   state.matrix[episodeId][rowKey][field] = event.target.value;
   saveState();
+  updateMatrixUI(episodeId, rowKey, field);
   renderEpisodeSwitch();
-  updateMatrixFieldUI(episodeId, rowKey, field);
   renderGlobalFeedback();
 }
 
-function onConceptInput(event) {
-  const key = event.target.dataset.concept;
-  state.concept[key] = event.target.value;
-  saveState();
-  updateConceptFieldUI(key);
-  renderConceptFeedback();
-  renderGlobalFeedback();
+function updateStandaloneCard(kind, id) {
+  const { task, value, domId } = resolveStandaloneTask(kind, id);
+  const evaluation = evaluateStandaloneTask(task, value);
+  const status = document.querySelector(`[data-task-status="${domId}"]`);
+  if (status) {
+    status.className = `status-badge ${evaluation.tone}`;
+    status.textContent = evaluation.label;
+  }
+  const feedback = document.querySelector(`[data-task-feedback="${domId}"]`);
+  if (feedback) {
+    feedback.className = `feedback-block ${evaluation.tone}`;
+    feedback.innerHTML = renderFeedbackInner(evaluation);
+  }
+  const suggestion = document.querySelector(`[data-task-suggestion="${domId}"]`);
+  if (suggestion) suggestion.innerHTML = "";
 }
 
-function updateMatrixFieldUI(episodeId, rowKey, field) {
+function updateMatrixUI(episodeId, rowKey, field) {
   if (episodeId !== activeEpisodeId) return;
   const row = MATRIX_ROWS.find((entry) => entry.key === rowKey);
   if (!row) return;
-
-  const value = state.matrix[episodeId][rowKey];
-  const fieldEval = evaluateField(row, field, value[field]);
-  const micro = document.querySelector(`[data-micro="${rowKey}:${field}"]`);
-  if (micro) {
-    micro.innerHTML = `<strong>${escapeHtml(fieldEval.title)}:</strong> ${escapeHtml(fieldEval.text)}`;
+  const fieldId = sanitizeId(`${episodeId}-${rowKey}-${field}`);
+  const rowId = sanitizeId(`${episodeId}-${rowKey}`);
+  const fieldEvaluation = evaluateMatrixField(episodeId, row, field, state.matrix[episodeId][rowKey][field]);
+  const fieldNode = document.querySelector(`[data-matrix-feedback="${fieldId}"]`);
+  if (fieldNode) {
+    fieldNode.className = `feedback-block ${fieldEvaluation.tone}`;
+    fieldNode.innerHTML = renderFeedbackInner(fieldEvaluation);
   }
+  const suggestion = document.querySelector(`[data-matrix-suggestion="${fieldId}"]`);
+  if (suggestion) suggestion.innerHTML = "";
 
-  const rowEval = evaluateRow(row, value);
-  const status = document.querySelector(`[data-row-status="${rowKey}"]`);
+  const rowEvaluation = evaluateMatrixRow(episodeId, row, state.matrix[episodeId][rowKey]);
+  const status = document.querySelector(`[data-row-status="${rowId}"]`);
   if (status) {
-    status.className = `status-badge ${rowEval.tone}`;
-    status.textContent = rowEval.label;
+    status.className = `status-badge ${rowEvaluation.tone}`;
+    status.textContent = rowEvaluation.label;
   }
-
-  const feedback = document.querySelector(`[data-row-feedback="${rowKey}"]`);
-  if (feedback) {
-    feedback.innerHTML = rowEval.messages
-      .map((message) => `<div class="feedback-block ${rowEval.tone}"><p>${escapeHtml(message)}</p></div>`)
-      .join("");
-  }
+  const feedback = document.querySelector(`[data-row-feedback="${rowId}"]`);
+  if (feedback) feedback.innerHTML = renderFeedbackBlockCollection(rowEvaluation);
 }
 
-function updateConceptFieldUI(key) {
-  const field = CONCEPT_FIELDS.find((entry) => entry.key === key);
-  if (!field) return;
-  const micro = document.querySelector(`[data-concept-micro="${key}"]`);
-  if (!micro) return;
-  const evaluation = evaluateConceptField(field, state.concept[key]);
-  micro.innerHTML = `<strong>${escapeHtml(evaluation.title)}:</strong> ${escapeHtml(evaluation.text)}`;
+function onStandaloneSuggest(event) {
+  const [kind, id] = event.target.dataset.suggestStandalone.split(":");
+  const { task, value, domId } = resolveStandaloneTask(kind, id);
+  const suggestion = buildStandaloneSuggestion(task, value);
+  const box = document.querySelector(`[data-task-suggestion="${domId}"]`);
+  if (!box) return;
+  box.innerHTML = renderSuggestionBox(`${kind}:${id}`, suggestion);
+  bindSuggestionButtons();
 }
 
-function evaluateField(row, field, value) {
-  const normalized = normalize(value);
-  const wordCount = countWords(normalized);
-  if (!normalized) {
-    return { title: "Fehlt", text: "Noch leer. Formuliere mindestens einen vollständigen Beobachtungssatz." };
-  }
-
-  if (field === "observation") {
-    if (wordCount >= 8 && hasAny(normalized, ["szene", "ida", "therese", "bering", "koch", "raum", "patient", "labor", "hörsaal", "hoersaal", "kaiser"])) {
-      return { title: "Treffend", text: "Die Beobachtung ist konkret genug, um daraus eine Deutung abzuleiten." };
-    }
-    return { title: "Zu allgemein", text: "Nenne eine Figur, einen Raum oder einen exakten Moment der Folge." };
-  }
-
-  if (field === "medium") {
-    if (wordCount >= 3 && hasAny(normalized, row.keywords)) {
-      return { title: "Benannt", text: "Das filmische Mittel ist erkennbar und anschlussfähig." };
-    }
-    return { title: "Unscharf", text: "Verwende einen filmsprachlichen Begriff wie Totale, Geräusch, Montage oder Perspektive." };
-  }
-
-  if (field === "effect") {
-    if (wordCount >= 8 && hasAny(normalized, ["zeigt", "wirkt", "verdeutlicht", "macht", "dadurch", "so", "weil", "konflikt", "macht", "ordnung"])) {
-      return { title: "Deutung vorhanden", text: "Beobachtung und Wirkung werden schon sinnvoll verbunden." };
-    }
-    return { title: "Mehr Deutung", text: "Formuliere explizit, was die Gestaltung über Konflikt, Macht oder Haltung aussagt." };
-  }
-
-  if (wordCount >= 7 && hasAny(normalized, ["serie", "staffel", "episode", "figur", "welt", "konzept", "konflikt", "prämisse", "praemisse", "engine"])) {
-    return { title: "Transfer gelingt", text: "Die Analyse wird produktiv in eine eigene Serie überführt." };
-  }
-  return { title: "Transfer ausbauen", text: "Leite aus der Beobachtung eine konkrete Regel für eure eigene Serie ab." };
+function onMatrixSuggest(event) {
+  const [episodeId, rowKey, field] = event.target.dataset.suggestMatrix.split(":");
+  const row = MATRIX_ROWS.find((entry) => entry.key === rowKey);
+  if (!row) return;
+  const suggestion = buildMatrixSuggestion(episodeId, row, field, state.matrix[episodeId][rowKey][field]);
+  const fieldId = sanitizeId(`${episodeId}-${rowKey}-${field}`);
+  const box = document.querySelector(`[data-matrix-suggestion="${fieldId}"]`);
+  if (!box) return;
+  box.innerHTML = renderSuggestionBox(`matrix:${episodeId}:${rowKey}:${field}`, suggestion);
+  bindSuggestionButtons();
 }
 
-function evaluateRow(row, value) {
-  const fields = ["observation", "medium", "effect", "concept"];
-  const complete = fields.filter((field) => normalize(value[field]).length > 0).length;
-  const strong = fields.filter((field) => evaluateField(row, field, value[field]).title !== "Fehlt" && !evaluateField(row, field, value[field]).title.includes("Zu allgemein") && !evaluateField(row, field, value[field]).title.includes("Unscharf") && !evaluateField(row, field, value[field]).title.includes("Mehr Deutung") && !evaluateField(row, field, value[field]).title.includes("Transfer ausbauen")).length;
+function onApplySuggestion(event) {
+  const target = event.target.dataset.applySuggestion;
+  if (target.startsWith("matrix:")) {
+    const [, episodeId, rowKey, field] = target.split(":");
+    const row = MATRIX_ROWS.find((entry) => entry.key === rowKey);
+    const suggestion = buildMatrixSuggestion(episodeId, row, field, state.matrix[episodeId][rowKey][field]).replacement;
+    const area = document.querySelector(`textarea[data-matrix-episode="${episodeId}"][data-matrix-row="${rowKey}"][data-matrix-field="${field}"]`);
+    if (!area) return;
+    area.value = suggestion;
+    state.matrix[episodeId][rowKey][field] = suggestion;
+    saveState();
+    updateMatrixUI(episodeId, rowKey, field);
+  } else {
+    const [kind, id] = target.split(":");
+    const { task } = resolveStandaloneTask(kind, id);
+    const suggestion = buildStandaloneSuggestion(task, kind === "method" ? state.method[id] : state.focus[id.split(":")[0]][id.split(":")[1]]).replacement;
+    const area = document.querySelector(`textarea[data-standalone-kind="${kind}"][data-standalone-id="${id}"]`);
+    if (!area) return;
+    area.value = suggestion;
+    if (kind === "method") state.method[id] = suggestion;
+    else {
+      const [episodeId, taskKey] = id.split(":");
+      state.focus[episodeId][taskKey] = suggestion;
+    }
+    saveState();
+    updateStandaloneCard(kind, id);
+  }
+  renderEpisodeSwitch();
+  renderGlobalFeedback();
+}
 
-  let tone = "weak";
-  let label = "Noch roh";
-  if (complete === 4 && strong >= 3) {
-    tone = "good";
-    label = "Interpretierend";
-  } else if (complete >= 3) {
+function resolveStandaloneTask(kind, id) {
+  if (kind === "method") {
+    const task = METHOD_MODULES.find((module) => module.key === id);
+    return { task, value: state.method[id], domId: sanitizeId(`${kind}-${id}`) };
+  }
+  const [episodeId, taskKey] = id.split(":");
+  const episode = EPISODES.find((entry) => entry.id === episodeId);
+  const task = episode.tasks.find((entry) => entry.key === taskKey);
+  return { task, value: state.focus[episodeId][taskKey], domId: sanitizeId(`${kind}-${id}`) };
+}
+
+function evaluateStandaloneTask(task, value) {
+  const analysis = analyzeLongAnswer(value, task);
+  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length <= 2 ? "medium" : "weak";
+  const label = tone === "good" ? "Qualifiziert" : tone === "medium" ? "Teilweise tragfähig" : "Noch zu pauschal";
+  const messages = [];
+  if (analysis.strengths.length > 0) messages.push(`Stark: ${analysis.strengths.join(" ")}`);
+  if (analysis.issues.length > 0) messages.push(`Noch nachschärfen: ${analysis.issues.join(" ")}`);
+  if (messages.length === 0) messages.push("Die Antwort erfüllt die Anforderungen.");
+  return { tone, label, messages };
+}
+
+function evaluateMatrixField(episodeId, row, field, value) {
+  const config = buildMatrixFieldConfig(episodeId, row, field);
+  const analysis = analyzeLongAnswer(value, config);
+  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length <= 2 ? "medium" : "weak";
+  const label = tone === "good" ? "Präzise" : tone === "medium" ? "Ansatz erkennbar" : "Unzureichend";
+  const messages = [];
+  if (analysis.strengths.length > 0) messages.push(`Stark: ${analysis.strengths.join(" ")}`);
+  if (analysis.issues.length > 0) messages.push(`Korrekturhinweis: ${analysis.issues.join(" ")}`);
+  if (messages.length === 0) messages.push("Das Feld ist bereits qualifiziert formuliert.");
+  return { tone, label, messages };
+}
+
+function evaluateMatrixRow(episodeId, row, value) {
+  const fieldNames = ["observation", "medium", "effect", "serial"];
+  const evaluations = fieldNames.map((field) => evaluateMatrixField(episodeId, row, field, value[field]));
+  const weak = evaluations.filter((entry) => entry.tone === "weak").length;
+  const medium = evaluations.filter((entry) => entry.tone === "medium").length;
+  let tone = "good";
+  let label = "Qualifiziert";
+  if (weak >= 2 || !fieldNames.every((field) => normalize(value[field]))) {
+    tone = "weak";
+    label = "Noch nicht tragfähig";
+  } else if (weak === 1 || medium >= 2) {
     tone = "medium";
-    label = "Auf dem Weg";
+    label = "Teilweise tragfähig";
   }
 
   const messages = [];
-  if (!normalize(value.observation)) messages.push("Beginne mit einer präzisen Beobachtung aus der Folge, nicht mit einer allgemeinen Wertung.");
-  if (!normalize(value.medium)) messages.push("Benenne dann das filmische Mittel klar, damit die Analyse nicht im Eindruck stecken bleibt.");
-  if (!normalize(value.effect)) messages.push("Formuliere anschließend die Wirkung: Was zeigt oder kritisiert die Szene dadurch?");
-  if (!normalize(value.concept)) messages.push("Schließe mit einem Transfer in eine eigene Serie ab, damit Analyse und Konzeption verbunden bleiben.");
+  if (!normalize(value.observation)) messages.push({ tone: "weak", text: "Die Zeile braucht zuerst eine konkrete Szene oder Konstellation, nicht nur ein allgemeines Thema." });
+  if (!normalize(value.medium)) messages.push({ tone: "weak", text: "Es fehlt ein sauber benanntes filmisches Mittel; ohne dieses bleibt die Analyse bloße Inhaltsangabe." });
+  if (!normalize(value.effect)) messages.push({ tone: "weak", text: "Die Deutung muss explizit formulieren, was die Gestaltung über Macht, Konflikt oder Haltung sichtbar macht." });
+  if (!normalize(value.serial)) messages.push({ tone: "weak", text: "Erkläre ausdrücklich, warum diese Beobachtung serielle Spannung erzeugt." });
   if (messages.length === 0) {
     if (tone === "good") {
-      messages.push("Diese Zeile funktioniert bereits als vollständiger Mini-Analysegang von Beobachtung über Deutung bis zur eigenen Serienregel.");
+      messages.push({ tone: "good", text: "Die Zeile verbindet Beobachtung, filmisches Mittel, Deutung und serielle Funktion bereits auf Analyse-Niveau." });
     } else {
-      messages.push("Die Zeile ist gefüllt. Jetzt einzelne Formulierungen schärfen: weniger Nacherzählung, mehr Filmbegriff und klarere Wirkung.");
+      messages.push({ tone: "medium", text: "Die Grundstruktur stimmt, aber einzelne Felder müssen noch präziser und begründeter werden." });
     }
   }
 
   return { tone, label, messages };
 }
 
-function evaluateConceptField(field, value) {
+function buildMatrixFieldConfig(episodeId, row, field) {
+  const anchors = [...row.anchors, ...EPISODE_ANCHORS[episodeId]];
+  if (field === "observation") {
+    return {
+      minWords: 22,
+      requiredTerms: anchors,
+      anchorTerms: anchors,
+      themeTerms: [],
+      requiredConnectors: [],
+      correctionTemplate:
+        "In der Szene [konkreter Moment] sieht man, wie [Figur/Institution] [Handlung] im Raum [Ort] organisiert. Auffällig ist dabei [präzise Beobachtung], sodass der Konflikt schon hier konkret sichtbar wird."
+    };
+  }
+  if (field === "medium") {
+    return {
+      minWords: 16,
+      requiredTerms: [...FILM_TERMS, ...row.mediumTerms],
+      anchorTerms: row.mediumTerms,
+      themeTerms: [],
+      requiredConnectors: [],
+      correctionTemplate:
+        "Filmisch arbeitet die Szene mit [Nahaufnahme/Totale/Perspektive/Licht/Ton/Schnitt]. Dieses Mittel ist hier wichtig, weil [konkrete Bild- oder Tonwirkung]."
+    };
+  }
+  if (field === "effect") {
+    return {
+      minWords: 24,
+      requiredTerms: row.themeTerms,
+      anchorTerms: [],
+      themeTerms: [...row.themeTerms, ...THEME_TERMS],
+      requiredConnectors: CONNECTORS,
+      correctionTemplate:
+        "Dadurch wirkt die Szene [Wirkung], weil [Kausalbegründung]. Sichtbar wird vor allem [Machtverhältnis/Konflikt/Haltung], nicht bloß [Inhaltsnacherzählung]."
+    };
+  }
+  return {
+    minWords: 22,
+    requiredTerms: SERIAL_TERMS,
+    anchorTerms: SERIAL_TERMS,
+    themeTerms: [...row.themeTerms, ...SERIAL_TERMS],
+    requiredConnectors: CONNECTORS,
+    correctionTemplate:
+      "Für die Serie ist dieser Moment wichtig, weil [offener Konflikt] nach der Folge nicht gelöst ist. Gerade dadurch kann in späteren Folgen [Entwicklung/Wiederkehr] weitergeführt werden."
+  };
+}
+
+function analyzeLongAnswer(value, config) {
   const normalized = normalize(value);
-  const wordCount = countWords(normalized);
+  const words = countWords(normalized);
+  const issues = [];
+  const strengths = [];
+  const matchedRequired = getMatchedTerms(normalized, config.requiredTerms || []);
+  const matchedTheme = getMatchedTerms(normalized, config.themeTerms || []);
+  const matchedConnectors = getMatchedTerms(normalized, config.requiredConnectors || []);
+  const matchedAnchors = getMatchedTerms(normalized, config.anchorTerms || []);
+
   if (!normalized) {
-    return { title: "Fehlt", text: "Noch leer. Formuliere mindestens 2-3 zusammenhängende Sätze." };
+    return { issues: ["Das Feld ist noch leer. Schreibe mehrere vollständige Sätze, nicht nur Stichworte."], strengths: [] };
   }
-  if (wordCount >= 18 && hasAny(normalized, field.keywords)) {
-    return { title: "Tragfähig", text: "Das Feld enthält genug Stoff, um eine Serienkonzeption zu tragen." };
+
+  if (words < Number(config.minWords || 0)) {
+    issues.push(`Der Text bleibt mit ${words} Wörtern zu kurz; nötig sind eher ${config.minWords}+ Wörter in zusammenhängenden Sätzen.`);
+  } else {
+    strengths.push(`Der Umfang ist mit ${words} Wörtern tragfähig.`);
   }
-  return { title: "Ausbauen", text: "Mehr Konfliktlogik, Figurenziel oder audiovisuelle Regel ergänzen." };
+
+  if ((config.requiredTerms || []).length > 0 && matchedRequired.length === 0) {
+    issues.push("Es fehlt ein passender Fach- oder Leitbegriff, der die Antwort inhaltlich scharf macht.");
+  } else if (matchedRequired.length > 0) {
+    strengths.push(`Passende Leitbegriffe sind vorhanden (${matchedRequired.slice(0, 3).join(", ")}).`);
+  }
+
+  if ((config.anchorTerms || []).length > 0 && matchedAnchors.length === 0) {
+    issues.push("Die Antwort bleibt zu allgemein; nenne eine Figur, einen Ort oder einen konkreten Szenenmoment.");
+  } else if (matchedAnchors.length > 0) {
+    strengths.push(`Die Antwort verankert sich konkret in der Folge (${matchedAnchors.slice(0, 3).join(", ")}).`);
+  }
+
+  if ((config.themeTerms || []).length > 0 && matchedTheme.length === 0) {
+    issues.push("Die Deutung benennt noch keinen klaren Konflikt-, Macht- oder Themenaspekt.");
+  } else if (matchedTheme.length > 0) {
+    strengths.push(`Thematische Schärfe ist erkennbar (${matchedTheme.slice(0, 3).join(", ")}).`);
+  }
+
+  if ((config.requiredConnectors || []).length > 0 && matchedConnectors.length === 0) {
+    issues.push("Es fehlt ein kausaler Zusammenhang; formuliere ausdrücklich, warum oder wodurch eine Wirkung entsteht.");
+  } else if (matchedConnectors.length > 0) {
+    strengths.push("Die Antwort begründet ihre Deutung sprachlich nachvollziehbar.");
+  }
+
+  if (!/[.!?]/.test(String(value || ""))) {
+    issues.push("Formuliere in vollständigen Sätzen; derzeit wirkt der Eintrag noch notizartig.");
+  }
+
+  if (words > 0 && words < 18 && !/[.!?]/.test(String(value || ""))) {
+    issues.push("So wirkt der Eintrag wie Stichwortsammlung statt Analyse.");
+  }
+
+  return { issues, strengths };
 }
 
-function evaluateConcept() {
-  const values = CONCEPT_FIELDS.map((field) => state.concept[field.key]);
-  const strong = CONCEPT_FIELDS.filter((field) => evaluateConceptField(field, state.concept[field.key]).title === "Tragfähig").length;
-  const filled = values.filter((value) => normalize(value)).length;
-
-  let tone = "weak";
-  let summary = "Die Analyse ist noch nicht in ein belastbares Serienkonzept überführt.";
-  if (filled === CONCEPT_FIELDS.length && strong >= 3) {
-    tone = "good";
-    summary = "Die Analyse liefert bereits ein tragfähiges Fundament für eine eigene Serie.";
-  } else if (filled >= 3) {
-    tone = "medium";
-    summary = "Die Brücke zur eigenen Serie ist angelegt, braucht aber noch präzisere Konflikt- und Stilregeln.";
-  }
-
-  const messages = [];
-  if (!normalize(state.concept.premise)) messages.push("Die Serienprämisse fehlt noch oder bleibt zu abstrakt.");
-  if (!normalize(state.concept.protagonist)) messages.push("Hauptfigur und Gegenkraft sollten als dauerhafter Konflikt beschrieben werden.");
-  if (!normalize(state.concept.engine)) messages.push("Die serielle Engine muss erklären, warum mehrere Episoden entstehen.");
-  if (!normalize(state.concept.style)) messages.push("Die eigene audiovisuelle Handschrift sollte mit klaren Regeln beschrieben werden.");
-  if (messages.length === 0) {
-    messages.push(summary);
-  }
-
-  return { tone, summary, messages };
+function buildStandaloneSuggestion(task, value) {
+  const analysis = analyzeLongAnswer(value, task);
+  const steps = [];
+  if (analysis.issues.some((issue) => issue.includes("zu kurz"))) steps.push("Baue die Antwort auf mindestens vier zusammenhängende Sätze aus.");
+  if (analysis.issues.some((issue) => issue.includes("zu allgemein"))) steps.push("Verankere die Antwort an einer konkreten Szene, Figur oder Raumkonstellation.");
+  if (analysis.issues.some((issue) => issue.includes("Fach- oder Leitbegriff"))) steps.push("Verwende mindestens einen passenden Analysebegriff oder Themenbegriff.");
+  if (analysis.issues.some((issue) => issue.includes("kausaler Zusammenhang"))) steps.push("Füge einen Satz mit 'weil', 'dadurch' oder 'indem' ein.");
+  return {
+    steps,
+    replacement: task.correctionTemplate
+  };
 }
 
-function getEpisodeScore(episodeId) {
-  const rows = MATRIX_ROWS.map((row) => evaluateRow(row, state.matrix[episodeId][row.key]));
-  const points = rows.reduce((sum, row) => sum + (row.tone === "good" ? 3 : row.tone === "medium" ? 2 : 1), 0);
-  const max = MATRIX_ROWS.length * 3;
-  return Math.round((points / max) * 100);
+function buildMatrixSuggestion(episodeId, row, field, value) {
+  const config = buildMatrixFieldConfig(episodeId, row, field);
+  const analysis = analyzeLongAnswer(value, config);
+  const steps = [];
+  if (analysis.issues.some((issue) => issue.includes("zu kurz"))) steps.push("Erweitere das Feld zu einem vollständigen Analyseabschnitt mit mindestens zwei bis drei Sätzen.");
+  if (analysis.issues.some((issue) => issue.includes("zu allgemein"))) steps.push("Binde die Aussage an Figur, Raum oder exakten Moment der Folge.");
+  if (analysis.issues.some((issue) => issue.includes("Fach- oder Leitbegriff"))) steps.push("Verwende einen passenden filmsprachlichen oder thematischen Fachbegriff.");
+  if (analysis.issues.some((issue) => issue.includes("kausaler Zusammenhang"))) steps.push("Begründe die Wirkung ausdrücklich mit einem Kausalzusammenhang.");
+  return {
+    steps,
+    replacement: config.correctionTemplate
+  };
+}
+
+function renderSuggestionBox(target, suggestion) {
+  return `
+    <div class="support-box support-box-suggestion">
+      <strong>Korrekturhilfe</strong>
+      <ul>${suggestion.steps.length > 0 ? suggestion.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("") : "<li>Die Antwort ist bereits tragfähig; nutze den Vorschlag nur bei Bedarf zur sprachlichen Schärfung.</li>"}</ul>
+      <p class="support-example">${escapeHtml(suggestion.replacement)}</p>
+      <button type="button" class="ghost helper-button" data-apply-suggestion="${escapeHtml(target)}">Vorschlag übernehmen</button>
+    </div>
+  `;
+}
+
+function renderFeedbackInner(evaluation) {
+  return evaluation.messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+}
+
+function renderFeedbackBlockCollection(evaluation) {
+  return evaluation.messages
+    .map((message) => `<div class="feedback-block ${message.tone}"><p>${escapeHtml(message.text)}</p></div>`)
+    .join("");
+}
+
+function summarizeStandaloneGroup(modules, kind) {
+  const evaluations = modules.map((module) => evaluateStandaloneTask(module, state[kind][module.key]));
+  return summarizeEvaluationSet(evaluations, modules.length, "Von den methodischen Freitextaufgaben");
+}
+
+function summarizeFocusGroup() {
+  const defs = EPISODES.flatMap((episode) =>
+    episode.tasks.map((task) => ({ task, value: state.focus[episode.id][task.key] }))
+  );
+  const evaluations = defs.map(({ task, value }) => evaluateStandaloneTask(task, value));
+  return summarizeEvaluationSet(evaluations, defs.length, "Bei den episodenbezogenen Aufgaben");
+}
+
+function summarizeMatrixAll() {
+  const evaluations = EPISODES.flatMap((episode) =>
+    MATRIX_ROWS.map((row) => evaluateMatrixRow(episode.id, row, state.matrix[episode.id][row.key]))
+  );
+  return summarizeEvaluationSet(evaluations, evaluations.length, "In der Interpretationsmatrix");
+}
+
+function summarizeEvaluationSet(evaluations, total, prefix) {
+  const good = evaluations.filter((entry) => entry.tone === "good").length;
+  const medium = evaluations.filter((entry) => entry.tone === "medium").length;
+  const weak = evaluations.filter((entry) => entry.tone === "weak").length;
+  let tone = "good";
+  if (weak > Math.ceil(total / 3)) tone = "weak";
+  else if (medium > 0 || weak > 0) tone = "medium";
+  const summary = `${prefix} sind ${good} von ${total} bereits qualifiziert, ${medium} teilweise tragfähig und ${weak} noch deutlich zu pauschal.`;
+  return { tone, summary };
+}
+
+function summarizeMatrixEpisode(episodeId) {
+  const rows = MATRIX_ROWS.map((row) => evaluateMatrixRow(episodeId, row, state.matrix[episodeId][row.key]));
+  const good = rows.filter((row) => row.tone === "good").length;
+  const weak = rows.filter((row) => row.tone === "weak").length;
+  const label = weak === 0 && good >= 4 ? "qualifiziert" : weak <= 2 ? "teilweise tragfähig" : "noch unscharf";
+  const detail = `${good}/${rows.length} Zeilen arbeiten bereits wirklich interpretierend.`;
+  return { label, detail };
+}
+
+function collectPriorities() {
+  const priorities = [];
+  METHOD_MODULES.forEach((module) => {
+    const evaluation = evaluateStandaloneTask(module, state.method[module.key]);
+    if (evaluation.tone === "weak") priorities.push(`Methodik nachschärfen: ${module.title}`);
+  });
+  EPISODES.forEach((episode) => {
+    episode.tasks.forEach((task) => {
+      const evaluation = evaluateStandaloneTask(task, state.focus[episode.id][task.key]);
+      if (evaluation.tone === "weak") priorities.push(`${episode.title}: ${task.title}`);
+    });
+  });
+  EPISODES.forEach((episode) => {
+    MATRIX_ROWS.forEach((row) => {
+      const evaluation = evaluateMatrixRow(episode.id, row, state.matrix[episode.id][row.key]);
+      if (evaluation.tone === "weak") priorities.push(`${episode.title}: Matrix "${row.title}"`);
+    });
+  });
+  return priorities;
 }
 
 function exportMarkdown() {
   const chunks = [];
   chunks.push("# Charité Analyseübung");
   chunks.push("");
+  chunks.push("## Methodischer Rahmen");
+  chunks.push("");
+  METHOD_MODULES.forEach((module) => {
+    chunks.push(`### ${module.title}`);
+    chunks.push(state.method[module.key] || "-");
+    chunks.push("");
+  });
   EPISODES.forEach((episode) => {
     chunks.push(`## ${episode.title}`);
     chunks.push("");
+    episode.tasks.forEach((task) => {
+      chunks.push(`### ${task.title}`);
+      chunks.push(state.focus[episode.id][task.key] || "-");
+      chunks.push("");
+    });
     MATRIX_ROWS.forEach((row) => {
       const entry = state.matrix[episode.id][row.key];
-      chunks.push(`### ${row.title}`);
+      chunks.push(`### Matrix: ${row.title}`);
       chunks.push(`- Beobachtung: ${entry.observation || "-"}`);
       chunks.push(`- Filmisches Mittel: ${entry.medium || "-"}`);
       chunks.push(`- Wirkung / Deutung: ${entry.effect || "-"}`);
-      chunks.push(`- Anschluss an Serienkonzeption: ${entry.concept || "-"}`);
+      chunks.push(`- Serielle Funktion: ${entry.serial || "-"}`);
       chunks.push("");
     });
   });
-
-  chunks.push("## Eigene Serie");
+  chunks.push("## Merksätze");
   chunks.push("");
-  CONCEPT_FIELDS.forEach((field) => {
-    chunks.push(`### ${field.label}`);
-    chunks.push(state.concept[field.key] || "-");
-    chunks.push("");
-  });
+  TAKEAWAYS.forEach((item) => chunks.push(`- ${item}`));
 
   const blob = new Blob([chunks.join("\n")], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -650,6 +1122,14 @@ function exportMarkdown() {
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
+function getMatchedTerms(value, terms) {
+  return [...new Set((terms || []).filter((term) => normalize(value).includes(normalize(term))))];
+}
+
+function countWords(value) {
+  return normalize(value).split(/\s+/).filter(Boolean).length;
+}
+
 function normalize(value) {
   return String(value || "")
     .toLowerCase()
@@ -658,12 +1138,8 @@ function normalize(value) {
     .trim();
 }
 
-function countWords(value) {
-  return normalize(value).split(/\s+/).filter(Boolean).length;
-}
-
-function hasAny(value, terms) {
-  return terms.some((term) => normalize(value).includes(normalize(term)));
+function sanitizeId(value) {
+  return String(value).replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
 function escapeHtml(value) {
