@@ -499,7 +499,7 @@ function renderStandaloneTaskCard(kind, id, task, value) {
       </div>
       <label>
         Freitextantwort
-        <textarea data-standalone-kind="${kind}" data-standalone-id="${id}" placeholder="${escapeHtml(task.prompt)}">${escapeHtml(value || "")}</textarea>
+        <textarea class="standalone-textarea" data-standalone-kind="${kind}" data-standalone-id="${id}" placeholder="${escapeHtml(task.prompt)}">${escapeHtml(value || "")}</textarea>
       </label>
       <div class="task-tools">
         <button type="button" class="ghost helper-button" data-suggest-standalone="${kind}:${id}">Korrekturhilfe anzeigen</button>
@@ -584,6 +584,7 @@ function renderMatrixField(episodeId, row, field, label, hint, value) {
     <label class="matrix-field">
       ${escapeHtml(label)}
       <textarea
+        class="matrix-textarea"
         data-matrix-episode="${episodeId}"
         data-matrix-row="${row.key}"
         data-matrix-field="${field}"
@@ -815,8 +816,15 @@ function resolveStandaloneTask(kind, id) {
 }
 
 function evaluateStandaloneTask(task, value) {
+  if (!normalize(value)) {
+    return {
+      tone: "weak",
+      label: "Fehlt",
+      messages: ["Noch nachschärfen: Das Feld ist leer. Ohne ausformulierte Antwort kann hier nichts als tragfähig gelten."]
+    };
+  }
   const analysis = analyzeLongAnswer(value, task);
-  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length <= 2 ? "medium" : "weak";
+  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length === 1 ? "medium" : "weak";
   const label = tone === "good" ? "Qualifiziert" : tone === "medium" ? "Teilweise tragfähig" : "Noch zu pauschal";
   const messages = [];
   if (analysis.strengths.length > 0) messages.push(`Stark: ${analysis.strengths.join(" ")}`);
@@ -826,9 +834,16 @@ function evaluateStandaloneTask(task, value) {
 }
 
 function evaluateMatrixField(episodeId, row, field, value) {
+  if (!normalize(value)) {
+    return {
+      tone: "weak",
+      label: "Fehlt",
+      messages: ["Korrekturhinweis: Das Feld ist leer. Erst eine ausformulierte Analyse kann bewertet werden."]
+    };
+  }
   const config = buildMatrixFieldConfig(episodeId, row, field);
   const analysis = analyzeLongAnswer(value, config);
-  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length <= 2 ? "medium" : "weak";
+  const tone = analysis.issues.length === 0 ? "good" : analysis.issues.length === 1 ? "medium" : "weak";
   const label = tone === "good" ? "Präzise" : tone === "medium" ? "Ansatz erkennbar" : "Unzureichend";
   const messages = [];
   if (analysis.strengths.length > 0) messages.push(`Stark: ${analysis.strengths.join(" ")}`);

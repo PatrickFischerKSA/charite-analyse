@@ -231,12 +231,12 @@ button.ghost {
 }
 
 .method-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .episode-grid,
 .takeaway-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .method-card,
@@ -428,13 +428,21 @@ label {
 
 textarea {
   width: 100%;
-  min-height: 132px;
+  min-height: 190px;
   resize: vertical;
   padding: 0.85rem 0.95rem;
   border-radius: 16px;
   border: 1px solid rgba(218, 228, 220, 0.15);
   background: rgba(5, 12, 16, 0.48);
   color: var(--ink);
+}
+
+.standalone-textarea {
+  min-height: 260px;
+}
+
+.matrix-textarea {
+  min-height: 220px;
 }
 
 textarea:focus {
@@ -502,7 +510,7 @@ textarea:focus {
 
 @media (max-width: 1100px) {
   .method-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .episode-grid,
